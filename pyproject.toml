@@ -1,0 +1,10 @@
+[project]
+name = "nucleus-api"
+version = "0.1.0"
+description = "Scalable FastAPI backend scaffold"
+requires-python = ">=3.11,<3.12"
+readme = "README.md"
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
