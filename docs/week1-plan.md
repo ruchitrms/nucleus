@@ -42,7 +42,12 @@ SQLAlchemy ORM model for the `users` table. Columns:
 Also need `models/refresh_token.py`:
 - `id`, `user_id` (FK), `token_hash`, `expires_at`, `revoked_at`, `created_at`
 
-### ⬜ Step 5 — Alembic setup + first migration
+### ✅ Step 5 — Alembic setup + first migration
+- `alembic init -t async alembic` — async template
+- `alembic.ini` — sqlalchemy.url left empty, URL set dynamically in env.py
+- `env.py` — wired `Base.metadata` + models + `settings` for DB URL
+- Migration generated and applied: `users`, `refresh_tokens`, `alembic_version` tables live in DB
+- Note: local PostgreSQL conflicted on port 5432 — Docker moved to port 5433
 - `alembic init alembic` in project root
 - Configure `alembic.ini` + `alembic/env.py` to use async engine and import all models
 - `alembic revision --autogenerate -m "create users and refresh tokens tables"`
