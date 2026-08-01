@@ -8,3 +8,9 @@ Second thing about the folder structure, got to know there are 3 folder structur
 
 # Day - 2 
 - So started with understanding the refresh token why do we need it? and how do we use it. Didn;t the knew ever why access token is short lived eg if it is ever stolen then the attacker have the access of it for lifetime. Created the docker-compose file from scrath line by line by knowing what every attribute means. created config file so that we can use this file anywhere where we need to fetch values from env variables. also got to know about the sessionmake and async session maker as a android dev I understodd that is we use sessionmaker to open the db connection and do the transaction it will block the main thread alteast thats what we used to call in android so hence using async session maker makes sense.
+
+# Day - 3
+- Created the models of users and refresh token, understood the Mapped[Str] defninig method and that too this is not nullable and if we need to create nullable then it is | None and we can assign default value, understodd the index= true usage why do we add this the actually find that value using the index from multiple rows.the next important thing is the albemic the migration tool which is used in industry how it helps o reduce the manula work for migration the table to sync postgres sql db
+
+# Day - 4
+- Okay so I understood the repository pattern I think this is similar to android repository pattern which take cares of getting the data from the source, so in android we used to have viewmodel which used to call the repository and its hish job of getting the data the viewmodel is not aware from wherer the data is coming. So here the repo is the only way from where the db data is updated. Services -> Repo. Routes -> Services so basically Routes -> Services -> Repo. 
