@@ -3,8 +3,8 @@ from datetime import datetime, timedelta, timezone
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-from fastapi import HTTPException
 
+from nucleus_api.core.exceptions import ConflictException, UnauthorizedException
 from nucleus_api.core.security import hash_password, hash_refresh_token
 from nucleus_api.services.auth_service import AuthService
 
@@ -55,14 +55,13 @@ class TestSignup:
         assert result.refresh_token
         assert result.token_type == "bearer"
 
-    async def test_duplicate_email_raises_400(self):
+    async def test_duplicate_email_raises_conflict(self):
         service, user_repo, _ = make_service()
         user_repo.get_user_by_email.return_value = make_user()
 
-        with pytest.raises(HTTPException) as exc:
+        with pytest.raises(ConflictException) as exc:
             await service.signup("user@example.com", "password123")
 
-        assert exc.value.status_code == 400
         assert "already registered" in exc.value.detail
 
     async def test_password_is_not_stored_in_plaintext(self):
@@ -97,37 +96,32 @@ class TestLogin:
         assert result.access_token
         assert result.refresh_token
 
-    async def test_unknown_email_raises_401(self):
+    async def test_unknown_email_raises_unauthorized(self):
         service, user_repo, _ = make_service()
         user_repo.get_user_by_email.return_value = None
 
-        with pytest.raises(HTTPException) as exc:
+        with pytest.raises(UnauthorizedException):
             await service.login("ghost@example.com", "password123")
 
-        assert exc.value.status_code == 401
-
-    async def test_wrong_password_raises_401(self):
+    async def test_wrong_password_raises_unauthorized(self):
         service, user_repo, _ = make_service()
         user_repo.get_user_by_email.return_value = make_user(password="correct")
 
-        with pytest.raises(HTTPException) as exc:
+        with pytest.raises(UnauthorizedException):
             await service.login("user@example.com", "wrong")
-
-        assert exc.value.status_code == 401
 
     async def test_wrong_email_and_wrong_password_return_identical_errors(self):
         """Both failure modes must produce the same response — don't reveal which part failed."""
         service, user_repo, _ = make_service()
 
         user_repo.get_user_by_email.return_value = None
-        with pytest.raises(HTTPException) as exc1:
+        with pytest.raises(UnauthorizedException) as exc1:
             await service.login("ghost@example.com", "anything")
 
         user_repo.get_user_by_email.return_value = make_user(password="correct")
-        with pytest.raises(HTTPException) as exc2:
+        with pytest.raises(UnauthorizedException) as exc2:
             await service.login("user@example.com", "wrong")
 
-        assert exc1.value.status_code == exc2.value.status_code
         assert exc1.value.detail == exc2.value.detail
 
 
@@ -158,38 +152,32 @@ class TestRefreshAccessToken:
 
         refresh_repo.revoke_refresh_token.assert_awaited_once()
 
-    async def test_token_not_found_raises_401(self):
+    async def test_token_not_found_raises_unauthorized(self):
         service, _, refresh_repo = make_service()
         refresh_repo.get_refresh_token.return_value = None
 
-        with pytest.raises(HTTPException) as exc:
+        with pytest.raises(UnauthorizedException):
             await service.refresh_access_token("nonexistent")
 
-        assert exc.value.status_code == 401
-
-    async def test_revoked_token_raises_401(self):
+    async def test_revoked_token_raises_unauthorized(self):
         service, _, refresh_repo = make_service()
         raw_token = "already-revoked"
         refresh_repo.get_refresh_token.return_value = make_token_record(
             uuid.uuid4(), raw_token, revoked=True
         )
 
-        with pytest.raises(HTTPException) as exc:
+        with pytest.raises(UnauthorizedException):
             await service.refresh_access_token(raw_token)
 
-        assert exc.value.status_code == 401
-
-    async def test_expired_token_raises_401(self):
+    async def test_expired_token_raises_unauthorized(self):
         service, _, refresh_repo = make_service()
         raw_token = "expired-token"
         refresh_repo.get_refresh_token.return_value = make_token_record(
             uuid.uuid4(), raw_token, expired=True
         )
 
-        with pytest.raises(HTTPException) as exc:
+        with pytest.raises(UnauthorizedException):
             await service.refresh_access_token(raw_token)
-
-        assert exc.value.status_code == 401
 
 
 # ── logout ────────────────────────────────────────────────────────────────────

@@ -31,7 +31,7 @@ Verified working: `python -c "from src.nucleus_api.core.config import settings; 
 - `session.py`: async engine + `async_sessionmaker` + `get_db()` FastAPI dependency ✅
 - Why async: FastAPI is async-native; blocking DB calls would negate the benefit (same as blocking main thread in Android)
 
-### ⬜ Step 4 — `models/user.py`
+### ✅ Step 4 — `models/user.py`
 SQLAlchemy ORM model for the `users` table. Columns:
 - `id` (UUID, primary key)
 - `email` (unique, indexed)
@@ -53,14 +53,14 @@ Also need `models/refresh_token.py`:
 - `alembic revision --autogenerate -m "create users and refresh tokens tables"`
 - `alembic upgrade head` — creates tables in the running PostgreSQL container
 
-### ⬜ Step 6 — `schemas/user.py`
+### ✅ Step 6 — `schemas/user.py`
 Pydantic schemas (not ORM models — these are request/response shapes):
 - `UserCreate`: email + password (input for signup)
 - `UserLogin`: email + password (input for login)
 - `UserResponse`: id + email + is_active (never expose hashed_password in response)
 - `TokenResponse`: access_token + refresh_token + token_type
 
-### ⬜ Step 7 — `repositories/user_repo.py`
+### ✅ Step 7 — `repositories/user_repo.py`
 All DB queries for users live here. Services call this — never raw DB calls in services.
 - `get_by_email(email)` → User or None
 - `create(email, hashed_password)` → User
@@ -71,26 +71,26 @@ Also `repositories/refresh_token_repo.py`:
 - `get_by_hash(token_hash)` → RefreshToken or None
 - `revoke(token_id)` → None
 
-### ⬜ Step 8 — `core/security.py`
+### ✅ Step 8 — `core/security.py`
 Two responsibilities:
 - Password hashing: `hash_password(plain)` → str, `verify_password(plain, hashed)` → bool (using passlib/bcrypt)
 - JWT: `create_access_token(user_id)`, `create_refresh_token()`, `decode_access_token(token)` → payload (using python-jose)
 
-### ⬜ Step 9 — `services/auth_service.py`
+### ✅ Step 9 — `services/auth_service.py`
 Business logic only — calls repos and security, never touches DB directly.
 - `signup(email, password)` → TokenResponse
 - `login(email, password)` → TokenResponse
 - `refresh(refresh_token)` → TokenResponse (with token rotation)
 - `logout(refresh_token)` → None (revokes token in DB)
 
-### ⬜ Step 10 — `api/v1/routes/auth.py`
+### ✅ Step 10 — `api/v1/routes/auth.py`
 Thin HTTP layer — parse request, call service, return response. No logic here.
 - `POST /api/v1/auth/signup`
 - `POST /api/v1/auth/login`
 - `POST /api/v1/auth/refresh`
 - `POST /api/v1/auth/logout`
 
-### ⬜ Step 11 — `main.py`
+### ✅ Step 11 — `main.py`
 Wire everything together:
 - Create `FastAPI()` app instance
 - Register the auth router with prefix `/api/v1`
@@ -110,6 +110,22 @@ Wire everything together:
 | Token rotation | Each refresh issues a new refresh token and revokes the old one |
 | Repository pattern | All DB queries in one place — services don't know SQL exists |
 | Why async SQLAlchemy? | FastAPI is async; blocking DB calls would block the entire event loop |
+
+---
+
+### ✅ Bonus — Tests (completed early, ahead of Week 6–7)
+- `tests/unit/test_security.py` — 19 tests for all security utility functions
+- `tests/unit/test_auth_service.py` — 14 tests for AuthService business logic (repos mocked)
+- `tests/integration/test_user_repo.py` — 9 tests against real PostgreSQL
+- `tests/integration/test_refresh_token_repo.py` — 7 tests against real PostgreSQL
+- Total: **49 tests, all passing** (run with `python -m pytest tests/ -v`)
+- Test DB: `nucleus_test` on the same Docker container
+
+---
+
+## Completed
+**Week 1 fully done — August 1, 2026**
+All 11 steps complete. Auth system live, tested end-to-end via Swagger UI and automated tests.
 
 ---
 

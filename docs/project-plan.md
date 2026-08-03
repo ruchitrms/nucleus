@@ -72,17 +72,18 @@ src/nucleus_api/
 
 ## Phase 1 Weekly Plan
 
-### Week 1–2: Auth, Validation, Error Handling
-Build the user authentication system end-to-end.
+### ✅ Week 1–2: Auth, Validation, Error Handling
+**Completed: August 1, 2026**
 
 **Deliverables:**
-- User signup/login with bcrypt-hashed passwords
-- JWT access token (15 min) + refresh token (30 days) with rotation
-- Refresh tokens stored hashed in DB, revoked on logout
-- Input validation on every endpoint via Pydantic schemas
-- Centralized error handling — no scattered try/catch
-- API versioning at `/api/v1/...`
-- `main.py` wired up and app boots cleanly
+- ✅ User signup/login with bcrypt-hashed passwords
+- ✅ JWT access token (15 min) + refresh token (30 days) with rotation
+- ✅ Refresh tokens stored hashed in DB, revoked on logout
+- ✅ Input validation on every endpoint via Pydantic schemas
+- ✅ API versioning at `/api/v1/...`
+- ✅ `main.py` wired up and app boots cleanly, Swagger UI at `/docs`
+- ✅ 49 tests (33 unit + 16 integration) — written early, ahead of Week 6–7
+- ⬜ Centralized error handling (`core/exceptions.py`) — next task
 
 **Checkpoint:** Can you explain out loud why plaintext passwords are dangerous and how JWT expiry/refresh works?
 
@@ -121,11 +122,13 @@ Containerize the full stack and deploy to a real environment.
 Write tests for critical paths, clean up fast-and-dirty code, write the README.
 
 **Deliverables:**
-- Unit tests for auth service (signup, login, refresh, logout)
-- Integration tests for auth endpoints
-- Refactor anything written quickly in weeks 1–4
-- README: architecture overview, how to run locally, decisions and why
-- Consider whether to restructure to domain-first before Phase 2
+- ✅ Unit tests for auth service (signup, login, refresh, logout) — done in Week 1
+- ✅ Unit tests for security utilities — done in Week 1
+- ✅ Integration tests for user + refresh token repos — done in Week 1
+- ⬜ Integration tests for auth HTTP endpoints (full request/response cycle)
+- ⬜ Refactor anything written quickly in weeks 1–4
+- ⬜ README: architecture overview, how to run locally, decisions and why
+- ⬜ Consider whether to restructure to domain-first before Phase 2
 
 **Checkpoint:** Could a stranger clone this repo and run it in under 10 minutes using only your README?
 
