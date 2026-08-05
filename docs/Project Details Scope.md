@@ -81,3 +81,10 @@ You have a deployed, dockerized, tested backend app with auth, caching, and asyn
 everything we will be building should be done and learn as that is the aim and make sure whatever you suggest should industry best and that is scalable and the actual insutry uses that not something which is not scalable. got it? 
 
 starting with our first and important task is setting up the project structure like the folder structure lets first discuss on this .
+
+---
+
+## Future Improvements / Deferred Work
+
+### Security
+- [ ] **HttpOnly cookie for refresh tokens** — Currently refresh tokens are returned in the JSON response body, which means JavaScript can read them (XSS risk). In a production app serving a browser, the refresh token should be set as an `HttpOnly; Secure; SameSite=Strict` cookie so JS cannot access it. The access token can stay in memory (not localStorage). This is the industry standard for browser-facing apps. Our current approach is fine for a pure API / mobile client.
