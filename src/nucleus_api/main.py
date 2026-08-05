@@ -2,10 +2,12 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from nucleus_api.api.v1.routes.auth import router as auth_router
 from nucleus_api.core.exceptions import NotFoundException, ConflictException, UnauthorizedException
+from nucleus_api.api.v1.routes.users import router as users_router
 
 app = FastAPI(title="Nucleus API", version="0.1.0")
 
 app.include_router(auth_router, prefix="/api/v1")
+app.include_router(users_router, prefix="/api/v1")
 
 @app.get("/health", tags=["health"])
 async def health():
